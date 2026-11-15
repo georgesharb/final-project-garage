@@ -15,7 +15,9 @@ A full-stack web application for managing a garage's clients, vehicles, and repa
 - Node.js + Express
 - Microsoft SQL Server
 - `mssql` package
-- bcrypt + JWT
+- `msnodesqlv8`
+- bcrypt (password hashing)
+- JWT (authentication)
 
 ## Setup Instructions
 
@@ -45,33 +47,6 @@ cd server
 npm install
 ```
 
-Create a `.env` file using `.env.example` as a template, then configure the required environment variables.
-
-Start the backend:
-
-```bash
-npm run dev
-```
-
-The backend runs at `http://localhost:3000/`.
-
-## Environment Variables
-
-The backend uses a `.env` file for configuration and sensitive information.
-
-Never commit the `.env` file. Use `.env.example` as a reference.
-
-## Database
-
-The application uses Microsoft SQL Server. Database creation and configuration instructions will be added during the database implementation.
-
-## Development
-
-The frontend and backend run independently. Keep both development servers running while working on the application.
-
-
-### Configure environment variables
-
 Inside the `server/` folder:
 
 1. Create a copy of `.env.example`.
@@ -85,12 +60,47 @@ PORT=3000
 
 DB_SERVER=localhost
 DB_NAME=GarageManagement
-DB_USER=your_username
-DB_PASSWORD=your_password
 
 JWT_SECRET=your_secret_key
 ```
 
 Each developer must configure their own `.env` file.
+**Important**: Never commit or share your .env file. Only .env.example should be uploaded to GitHub.
 
-**Important:** Never commit or share your `.env` file. Only `.env.example` should be uploaded to GitHub.
+Start the backend:
+
+```bash
+npm run dev
+```
+The backend runs at `http://localhost:3000/`.
+
+## Development
+
+The frontend and backend run independently. Keep both development servers running while working on the application.
+
+## Database
+
+The application uses Microsoft SQL Server as its database management system.
+
+The database is named `GarageManagement` and contains five tables:
+
+- `users` – Stores account information and user roles.
+- `clients` – Stores client profiles.
+- `cars` – Stores vehicles belonging to clients.
+- `repairs` – Stores vehicle repair history.
+- `appointments` – Stores appointment requests and their status.
+
+### Database Setup
+
+1. Install Microsoft SQL Server Developer Edition and SQL Server Management Studio (SSMS).
+2. Create a database named `GarageManagement`.
+3. Open the `database/create_tables.sql` script in SSMS.
+4. Execute the script to create the tables, relationships, and constraints.
+
+### Database Connection
+
+The backend connects to Microsoft SQL Server using the `mssql` and `msnodesqlv8` packages with Windows Authentication.
+
+This allows the application to connect using the current Windows account without requiring a separate SQL Server username and password in the local development environment.
+
+**Note:** Developers must have SQL Server installed and configured on their own machines, including the required ODBC Driver.
