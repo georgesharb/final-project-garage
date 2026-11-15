@@ -4,9 +4,24 @@ A full-stack web application for managing a garage's clients, vehicles, and repa
 
 ## Project Structure
 
-- `client/` – React + Vite frontend.
-- `server/` – Node.js + Express backend.
-- `.gitignore` – Excludes dependencies, build files, and private environment files.
+garage-management/
+│
+├── client/                  # React + Vite frontend
+│
+├── server/                  # Node.js + Express backend
+│   ├── db.js                # SQL Server connection and connection pool
+│   ├── server.js            # Express server
+│   ├── package.json
+│   ├── package-lock.json
+│   └── .env                  # Local environment variables (not committed)
+│
+├── database/
+│   └── create_tables.sql    # Database schema and constraints
+│
+|── database architecture/   # Database schema and relationships
+|
+├── .gitignore
+└── README.md
 
 ## Technologies
 
