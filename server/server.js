@@ -8,6 +8,7 @@ import { requireAuth, requireRole } from './middleware/auth.js';
 
 import authRoutes from './routes/auth.js';
 import servicesRoutes from './routes/services.js';
+import vinRoutes from './routes/vin.js';
 import clientRoutes from './routes/client.js';
 import ownerDashboardRoutes from './routes/owner/dashboard.js';
 import ownerClientsRoutes from './routes/owner/clients.js';
@@ -28,6 +29,9 @@ app.get('/', (req, res) => {
 // ---------- Public ----------
 app.use('/api/auth', authRoutes);
 app.use('/api/services', servicesRoutes);
+
+// ---------- Any logged-in user (owner or client) ----------
+app.use('/api/vin', requireAuth, vinRoutes);
 
 // ---------- Client only ----------
 app.use('/api/me', requireAuth, requireRole('client'), clientRoutes);

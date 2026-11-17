@@ -20,6 +20,7 @@ The owner is **not** seeded: open the app, **Sign up**, choose **Owner** (works 
 | `middleware/auth.js` | `requireAuth` checks the JWT, `requireRole('owner')` checks the role |
 | `routes/auth.js` | Sign up (client or owner once), login with role, logout |
 | `routes/services.js` | Public list of services (fixed list, no table) |
+| `routes/vin.js` | VIN decoder: calls the free NHTSA vPIC API to fill brand, model, year |
 | `routes/client.js` | Client: my info, my cars, my repairs, my appointments |
 | `routes/owner/*.js` | Owner: dashboard, clients, cars (+ search), repairs, appointments, bin |
 | `seed.js` | Demo data |
@@ -41,6 +42,11 @@ Send the token as `Authorization: Bearer <token>`. Every error is `{ "error": ".
 | POST | /api/auth/register | name, phone, email, password (client) |
 | POST | /api/auth/login | email, password, role (`client` / `owner`) → `{ token, user: { id, email, role } }` |
 | POST | /api/auth/logout | |
+
+**Any logged-in user (owner or client)**
+| Method | URL | Body |
+|---|---|---|
+| GET | /api/vin/:vin | → `{ brand, model, year }` from the NHTSA vPIC API (404 if unknown, 502 if the service is down) |
 
 **Client (`/api/me`)**: view, add cars, book. Can NOT edit his info or cars.
 | Method | URL | Body |
