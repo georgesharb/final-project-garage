@@ -1,6 +1,7 @@
 // Input checks (Session 21). Each function returns an error message, or null if OK.
 
-const isEmail = (value) => /^\S+@\S+\.\S+$/.test(value || '');
+// name@domain.ending, the ending (com, net, lb...) needs at least 2 letters
+const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(value || '');
 export const isEmpty = (value) => value === undefined || value === null || String(value).trim() === '';
 
 export function checkPassword(password) {
@@ -9,14 +10,14 @@ export function checkPassword(password) {
 }
 
 export function checkEmailPassword({ email, password }) {
-  if (!isEmail(email)) return 'Invalid email';
+  if (!isEmail(email)) return 'Invalid email (example: name@gmail.com)';
   return checkPassword(password);
 }
 
 // name, phone and email are all required
 export function checkClient({ name, phone, email }) {
   if (isEmpty(name) || isEmpty(phone) || isEmpty(email)) return 'Name, phone and email are required';
-  if (!isEmail(email)) return 'Invalid email';
+  if (!isEmail(email)) return 'Invalid email (example: name@gmail.com)';
   return null;
 }
 
