@@ -1,0 +1,475 @@
+/* Styles of the main page only.
+   Every rule starts with .home, so nothing here changes the owner, client or login pages.
+   Colors and fonts come from index.css (--black, --gold, --ivory, --warm-gray, --taupe).
+
+   1. Tokens   2. Base   3. Shared pieces (label, button)
+   4. Navbar and footer   5. Sections   6. Media queries (mobile-first) */
+
+/* 1. TOKENS */
+.home {
+  /* same two colors as index.css, a little stronger so text passes the 4.5:1 contrast rule */
+  --dark-gold: #7a5f2e;   /* labels and links on ivory */
+  --dim-gray: #8c877c;    /* secondary text on black */
+  --line-dark: #2a2a2c;   /* thin lines on black */
+  --line-light: #d9d2c2;  /* thin lines on ivory */
+
+  --sp-1: 8px;
+  --sp-2: 16px;
+  --sp-3: 24px;
+  --sp-4: 32px;
+  --sp-5: 48px;
+  --sp-6: 64px;
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --spaced: 0.25em;   /* letter spacing of labels, links and buttons */
+  --speed: 180ms;
+}
+
+/* 2. BASE */
+.home {
+  background: var(--ivory);
+  color: var(--black);
+  line-height: 1.5;
+}
+
+.home h1,
+.home h2,
+.home h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0;
+  color: inherit;
+}
+
+.home h1 { font-size: 2.75rem; margin-bottom: var(--sp-3); }
+.home h2 { font-size: 2.25rem; margin-bottom: var(--sp-3); }
+.home h3 { font-size: 1.625rem; margin-bottom: var(--sp-1); }
+
+.home p {
+  margin-top: 0;
+  margin-bottom: var(--sp-2);
+}
+
+.home img {
+  display: block;
+  max-width: 100%;
+}
+
+.home .container {
+  max-width: 1460px;
+  margin: 0 auto;
+}
+
+.home .section {
+  padding: var(--sp-5) var(--sp-2);
+}
+
+.home .section-dark {
+  background: var(--black);
+  color: var(--ivory);
+}
+
+/* 3. SHARED PIECES */
+.home .label {
+  margin-bottom: var(--sp-2);
+  font-size: 0.8125rem;
+  letter-spacing: var(--spaced);
+  color: var(--dark-gold);
+}
+
+/* on black the label uses the lighter gold */
+.home .section-dark .label,
+.home .hero .label {
+  color: var(--gold);
+}
+
+.home .note {
+  color: var(--taupe);
+}
+
+.home .button {
+  display: inline-block;
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--gold);
+  border-radius: 0;
+  background: var(--gold);
+  color: var(--black);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: var(--spaced);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--speed) ease-out, color var(--speed) ease-out;
+}
+
+.home .button:hover {
+  background: var(--ivory);
+  border-color: var(--ivory);
+}
+
+/* white outline */
+.home .button-outline {
+  background: none;
+  border-color: var(--ivory);
+  color: var(--ivory);
+  font-weight: 400;
+}
+
+.home .button-outline:hover {
+  background: var(--ivory);
+  color: var(--black);
+}
+
+/* gold outline */
+.home .button-line {
+  padding: var(--sp-1) var(--sp-3);
+  background: none;
+  color: var(--gold);
+  font-weight: 400;
+}
+
+.home .button-line:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--black);
+}
+
+/* 4. NAVBAR AND FOOTER */
+.home .navbar {
+  padding: 0 var(--sp-2);
+  background: var(--black);
+}
+
+.home .navbar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.home .brand {
+  font-family: var(--serif);
+  font-size: 1.875rem;
+  color: var(--ivory);
+  text-decoration: none;
+}
+
+.home .brand span {
+  color: var(--gold);
+}
+
+.home .nav-links,
+.home .nav-account {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+}
+
+.home .nav-links a,
+.home .nav-link {
+  font-size: 0.8125rem;
+  letter-spacing: var(--spaced);
+  color: var(--ivory);
+  text-decoration: none;
+  transition: color var(--speed) ease-out;
+}
+
+.home .nav-links a:hover,
+.home .nav-link:hover {
+  color: var(--gold);
+}
+
+.home .footer {
+  padding: var(--sp-5) var(--sp-2);
+  background: var(--black);
+  color: var(--dim-gray);
+  text-align: center;
+}
+
+.home .footer p {
+  margin-bottom: var(--sp-1);
+}
+
+/* 5. SECTIONS */
+
+/* hero: on a phone the text, the photo and the controls are stacked */
+.home .hero {
+  display: grid;
+  grid-template-areas:
+    "text"
+    "photo"
+    "controls";
+  align-items: center;
+  background: var(--black);
+  color: var(--ivory);
+}
+
+.home .hero-text {
+  grid-area: text;
+  padding: var(--sp-5) var(--sp-2) var(--sp-3);
+}
+
+.home .hero-lead {
+  max-width: 560px;
+  margin-bottom: var(--sp-4);
+  font-size: 1.125rem;
+  color: var(--warm-gray);
+}
+
+.home .hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.home .hero-photo {
+  grid-area: photo;
+  width: 100%;
+}
+
+.home .hero-controls {
+  grid-area: controls;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-2) var(--sp-4);
+}
+
+.home .slide-numbers,
+.home .slide-number {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.home .slide-number {
+  font-family: var(--serif);
+  font-size: 1.125rem;
+  color: var(--dim-gray);
+}
+
+.home .slide-number.active {
+  color: var(--gold);
+}
+
+.home .slide-line {
+  width: 40px;
+  border-top: 1px solid var(--gold);
+}
+
+.home .slide-arrows {
+  display: flex;
+  gap: var(--sp-1);
+}
+
+.home .arrow {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 1px solid var(--dark-gold);
+  border-radius: 0;
+  background: none;
+  color: var(--gold);
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--speed) ease-out, color var(--speed) ease-out;
+}
+
+.home .arrow:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--black);
+}
+
+.home .services {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.home .service-grid {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.home .service {
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--gold);
+}
+
+.home .service p {
+  margin-bottom: 0;
+  color: var(--taupe);
+}
+
+.home .about {
+  display: grid;
+  gap: var(--sp-4);
+  align-items: center;
+}
+
+.home .about img {
+  width: 100%;
+}
+
+.home .about-lead {
+  max-width: 560px;
+  margin-bottom: var(--sp-4);
+  color: var(--warm-gray);
+}
+
+.home .step {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--line-dark);
+}
+
+.home .step-number {
+  font-family: var(--serif);
+  font-size: 1.625rem;
+  color: var(--gold);
+}
+
+.home .step p {
+  margin-bottom: 0;
+  color: var(--warm-gray);
+}
+
+.home .location {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.home .location p {
+  color: var(--taupe);
+}
+
+.home .location a {
+  color: var(--dark-gold);
+}
+
+.home .location h3 {
+  margin-top: var(--sp-3);
+}
+
+.home .hours-row {
+  display: flex;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-1);
+}
+
+.home .hours-days {
+  width: 140px;
+}
+
+.home .map {
+  width: 100%;
+  height: 320px;
+  border: 1px solid var(--line-light);
+}
+
+/* 6. MEDIA QUERIES */
+@media (min-width: 600px) {
+  .home h1 { font-size: 3.75rem; }
+  .home h2 { font-size: 2.75rem; }
+
+  .home .navbar,
+  .home .section,
+  .home .footer {
+    padding-left: var(--sp-4);
+    padding-right: var(--sp-4);
+  }
+
+  .home .hero-text {
+    padding: var(--sp-5) var(--sp-4) var(--sp-3);
+  }
+
+  .home .hero-controls {
+    padding-left: var(--sp-4);
+    padding-right: var(--sp-4);
+  }
+
+  .home .hero-lead {
+    font-size: 1.25rem;
+  }
+
+  .home .slide-line {
+    width: 72px;
+  }
+
+  .home .service-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .home h1 { font-size: 5rem; }
+
+  .home .navbar,
+  .home .section,
+  .home .footer {
+    padding-left: var(--sp-6);
+    padding-right: var(--sp-6);
+  }
+
+  .home .section {
+    padding-top: var(--sp-6);
+    padding-bottom: var(--sp-6);
+  }
+
+  /* text on the left, photo on the right, controls under both */
+  .home .hero {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "text photo"
+      "controls controls";
+  }
+
+  .home .hero-text {
+    padding: var(--sp-6) 0 var(--sp-6) var(--sp-6);
+  }
+
+  /* keeps the hero the same height when the slide text changes */
+  .home .hero h1 {
+    min-height: 2.3em;
+  }
+
+  .home .hero-lead {
+    min-height: 3em;
+  }
+
+  .home .hero-controls {
+    padding: 0 var(--sp-6) var(--sp-4);
+  }
+
+  .home .services {
+    grid-template-columns: 1fr 3fr;
+    gap: var(--sp-6);
+  }
+
+  .home .service-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--sp-5);
+  }
+
+  .home .about {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-6);
+  }
+
+  .home .location {
+    grid-template-columns: 1fr 2fr;
+  }
+
+  .home .map {
+    height: 380px;
+  }
+}
