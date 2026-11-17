@@ -1,0 +1,7 @@
+# dependencies and build output
+node_modules/
+dist/
+
+# secrets: never commit a real .env (only .env.example and .env.demo)
+.env
+.env.local
