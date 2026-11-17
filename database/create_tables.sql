@@ -19,6 +19,7 @@ CREATE TABLE clients (
     CONSTRAINT FK_clients_users
     FOREIGN KEY (user_id)
     REFERENCES users(id)
+    deleted_at DATETIME2 NULL
 );
 
 -- 3. CARS
@@ -29,11 +30,12 @@ CREATE TABLE cars (
     model NVARCHAR(50) NOT NULL,
     year SMALLINT NULL,
     vin VARCHAR(17) NOT NULL UNIQUE,
-    plate_number NVARCHAR(20) NOT NULL,
+    plate_number NVARCHAR(20) NULL,
 
     CONSTRAINT FK_cars_clients
     FOREIGN KEY (client_id)
     REFERENCES clients(id)
+    deleted_at DATETIME2 NULL
 );
 
 -- Additional constraint for appointments
@@ -61,6 +63,8 @@ CREATE TABLE repairs (
 
     CONSTRAINT CK_repairs_status
     CHECK (status IN ('in progress', 'done'))
+
+    deleted_at DATETIME2 NULL
 );
 
 -- 5. APPOINTMENTS
