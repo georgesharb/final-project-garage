@@ -2,12 +2,16 @@
 import express from 'express';
 import { query } from '../../query.js';
 import { checkFutureDate } from '../../validate.js';
+import { toSqlDateTime } from '../../dates.js';
 
 const router = express.Router();
 
 // GET /api/owner/appointments?status=pending
 router.get('/', async (req, res) => {
   const status = req.query.status || null;
+  if (status && !['pending', 'accepted', 'rejected', 'rescheduled'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid status' });
+  }
   const rows = await query(
     `SELECT a.*, cl.name AS client_name, cl.phone AS client_phone,
             c.brand, c.model, c.plate_number
@@ -54,7 +58,7 @@ router.patch('/:id/propose', async (req, res) => {
   const problem = checkFutureDate(proposed_datetime);
   if (problem) return res.status(400).json({ error: problem });
 
-  const appointment = await setStatus(req.params.id, 'rescheduled', proposed_datetime);
+  const appointment = await setStatus(req.params.id, 'rescheduled', toSqlDateTime(proposed_datetime));
   if (!appointment) return res.status(404).json({ error: 'Appointment not found' });
   res.json(appointment);
 });

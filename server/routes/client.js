@@ -6,6 +6,7 @@
 import express from 'express';
 import { query } from '../query.js';
 import { checkCar, checkFutureDate, isEmpty } from '../validate.js';
+import { toSqlDateTime } from '../dates.js';
 
 const router = express.Router();
 
@@ -101,7 +102,7 @@ router.post('/appointments', async (req, res) => {
     `INSERT INTO appointments (client_id, car_id, service_requested, preferred_datetime, notes, status)
      OUTPUT INSERTED.*
      VALUES (@clientId, @car_id, @service_requested, @preferred_datetime, @notes, 'pending')`,
-    { clientId: req.user.clientId, car_id, service_requested, preferred_datetime, notes: notes || null }
+    { clientId: req.user.clientId, car_id, service_requested, preferred_datetime: toSqlDateTime(preferred_datetime), notes: notes || null }
   );
   res.status(201).json(rows[0]);
 });

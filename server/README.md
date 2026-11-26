@@ -3,42 +3,49 @@
 Node.js + Express + SQL Server. Runs on `http://localhost:3000`, all routes start with `/api`.
 
 ## Run it
-1. Run `database/create_tables.sql`, then `database/backend_updates.sql` in SSMS (database `GarageManagement`).
-2. In `server/`: copy `.env.example` to `.env`, set `JWT_SECRET` (any long random text) and `FRONTEND_URL`.
-3. `npm install`, then `npm run seed` (demo client `client@garage.com` / `client123` with a car and a repair).
-4. `npm run dev`.
+1. Create the database `GarageManagement` and run `database/create_tables.sql` in it.
+2. In `server/`: copy `.env.example` to `.env` and fill it in:
+   - on a laptop with SQL Server: `DB_SERVER=localhost`, leave `DB_USER` empty → Windows Authentication (needs ODBC Driver 18);
+   - with Azure SQL: `DB_USER=garage_app` + `DB_PASSWORD` (see `database/create_app_user.sql`);
+   - `JWT_SECRET`: any long random text.
+3. `npm install`, then create the owner **once**: `npm run create-owner -- owner@example.com MyPassword123`
+4. `npm run dev`. Tests: `npm test` (no database needed).
 
-The owner is **not** seeded: open the app, **Sign up**, choose **Owner** (works only once).
+The database starts **empty** (no built-in data). Clients create their own account with **Sign up** on the website. The owner logs in with the **Owner** choice.
 
 ## Files
 | File | What it does |
 |---|---|
-| `server.js` | Starts Express after the DB connects, connects every route, handles errors |
-| `db.js` | SQL Server connection (Windows Authentication) → `poolPromise` |
+| `app.js` | The Express app: security (helmet, CORS, rate limits), every route, error handling. The tests import it |
+| `server.js` | Starts the app on `PORT` and connects to the database in the background |
+| `db.js` | `getPool()`: connects on first use. `DB_USER` filled → SQL login (Azure), empty → Windows login. Retries if the DB was down |
+| `dates.js` | `toSqlDateTime()`: turns a form date (`2026-11-28T10:30`) into the SQL Server format |
 | `query.js` | `query(sql, params)`: runs a query with `@parameters` (protects from SQL injection) |
 | `validate.js` | Input checks (email, password, VIN, year, cost, dates) |
 | `middleware/auth.js` | `requireAuth` checks the JWT, `requireRole('owner')` checks the role |
-| `routes/auth.js` | Sign up (client or owner once), login with role, logout |
-| `routes/services.js` | Public list of services (fixed list, no table) |
+| `routes/auth.js` | Client sign up, login with role, logout |
+| `create-owner.js` | One-time command that creates the owner account |
 | `routes/vin.js` | VIN decoder: calls the free NHTSA vPIC API to fill brand, model, year |
 | `routes/client.js` | Client: my info, my cars, my repairs, my appointments |
 | `routes/owner/*.js` | Owner: dashboard, clients, cars (+ search), repairs, appointments, bin |
-| `seed.js` | Demo data |
+
+| `tests/validate.test.js` | Unit tests of the input checks and the date helper |
+| `tests/routes.test.js` | API tests with **Supertest** (tokens, roles, bad input, headers, CORS, rate limit) |
 
 ## Security
 - Passwords hashed with **bcrypt**. Login returns a **JWT** `{ id, role, clientId }`.
+- **helmet** headers, **CORS** limited to `FRONTEND_URL`, JSON body limit 100 kb.
+- **Rate limit**: 10 logins per 15 minutes, 10 sign ups per hour (answers 429).
+- Every query goes through `query.js` with `@parameters` (no SQL injection).
 - `/api/owner/*` needs role `owner`, `/api/me/*` needs role `client`.
 - Client routes take the client id **from the token only**, so a client can never reach another client's data.
 
 ## Endpoints
-Send the token as `Authorization: Bearer <token>`. Every error is `{ "error": "..." }` (400, 401, 403, 404, 409).
+Send the token as `Authorization: Bearer <token>`. Every error is `{ "error": "..." }` (400, 401, 403, 404, 409, 429, 503 when the database is asleep or unreachable).
 
 **Public**
 | Method | URL | Body |
 |---|---|---|
-| GET | /api/services | |
-| GET | /api/auth/owner-exists | → `{ exists }` |
-| POST | /api/auth/register-owner | email, password (works once only) |
 | POST | /api/auth/register | name, phone, email, password (client) |
 | POST | /api/auth/login | email, password, role (`client` / `owner`) → `{ token, user: { id, email, role } }` |
 | POST | /api/auth/logout | |

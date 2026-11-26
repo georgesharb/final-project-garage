@@ -1,9 +1,10 @@
-// /api/auth  -> sign up, login (public routes, no token needed)
+// /api/auth  -> client sign up, login (public routes, no token needed)
+// The owner account is NOT created here: run `npm run create-owner` once (see create-owner.js).
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { query } from '../query.js';
-import { checkEmailPassword, isEmpty } from '../validate.js';
+import { checkEmailPassword, checkLogin, checkPhone, isEmpty } from '../validate.js';
 
 const router = express.Router();
 
@@ -16,41 +17,21 @@ function makeToken(user, clientId) {
   );
 }
 
-// GET /api/auth/owner-exists -> frontend uses this to enable/disable "Owner" on Sign up
-router.get('/owner-exists', async (req, res) => {
-  const rows = await query("SELECT id FROM users WHERE role = 'owner'");
-  res.json({ exists: rows.length > 0 });
-});
-
-// POST /api/auth/register-owner  { email, password }
-// Works only ONCE: after the first owner exists, it is refused
-// (the database also blocks a 2nd owner with the UX_users_single_owner index).
-router.post('/register-owner', async (req, res) => {
-  const { email, password } = req.body;
-  const problem = checkEmailPassword(req.body);
-  if (problem) return res.status(400).json({ error: problem });
-
-  const owners = await query("SELECT id FROM users WHERE role = 'owner'");
-  if (owners.length > 0) {
-    return res.status(403).json({ error: 'Owner registration is closed' });
-  }
-
-  const hash = await bcrypt.hash(password, 10);
-  await query(
-    "INSERT INTO users (email, password_hash, role) VALUES (@email, @hash, 'owner')",
-    { email, hash }
-  );
-  res.status(201).json({ message: 'Owner account created' });
-});
-
 // POST /api/auth/register  { name, phone, email, password }  -> a client signs up
 // (the only way to become a client: the owner never creates clients)
 router.post('/register', async (req, res) => {
   const { email, password, name, phone } = req.body;
   const problem =
     (isEmpty(name) || isEmpty(phone) ? 'Name and phone are required' : null) ||
+    checkPhone(phone) ||
     checkEmailPassword(req.body);
   if (problem) return res.status(400).json({ error: problem });
+
+  // Clear message if the email is already used (instead of a SQL error)
+  const existing = await query('SELECT id FROM users WHERE email = @email', { email });
+  if (existing.length > 0) {
+    return res.status(409).json({ error: 'An account with this email already exists. Please log in.' });
+  }
 
   const hash = await bcrypt.hash(password, 10);
 
@@ -63,20 +44,22 @@ router.post('/register', async (req, res) => {
      COMMIT;`,
     { email, hash, name, phone }
   );
-  res.status(201).json({ message: 'Account created, you can log in' });
+  res.status(201).json({ message: 'Your account is ready. You can log in now.' });
 });
 
 // POST /api/auth/login  { email, password, role }  -> { token, user }
 // role = 'client' or 'owner', chosen on the login page
 router.post('/login', async (req, res) => {
   const { email, password, role } = req.body;
+  const problem = checkLogin(req.body);
+  if (problem) return res.status(400).json({ error: problem });
 
   const users = await query('SELECT * FROM users WHERE email = @email', { email });
   const user = users[0];
 
   // Same message for wrong email, password or role (don't tell attackers which one)
   if (!user || user.role !== role || !(await bcrypt.compare(password || '', user.password_hash))) {
-    return res.status(401).json({ error: 'Wrong email, password or role' });
+    return res.status(401).json({ error: 'Incorrect email or password. Check that you chose the right account type (Client or Owner).' });
   }
 
   // For a client, find his clients.id so every client route can use it
@@ -86,7 +69,7 @@ router.post('/login', async (req, res) => {
       'SELECT id FROM clients WHERE user_id = @id AND deleted_at IS NULL',
       { id: user.id }
     );
-    if (clients.length === 0) return res.status(403).json({ error: 'This account is disabled' });
+    if (clients.length === 0) return res.status(403).json({ error: 'This account was removed by the garage. Please contact us.' });
     clientId = clients[0].id;
   }
 

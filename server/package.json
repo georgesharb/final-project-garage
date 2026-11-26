@@ -1,13 +1,13 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Garage management API (Express + SQL Server)",
   "main": "server.js",
   "scripts": {
-    "dev": "node --watch server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "seed": "node seed.js"
+    "dev": "node --watch server.js",
+    "test": "node --test",
+    "create-owner": "node create-owner.js"
   },
   "keywords": [],
   "author": "",
@@ -18,8 +18,18 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.10",
     "express": "^5.3.0",
+    "express-rate-limit": "^8.7.5",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
-    "msnodesqlv8": "^6.2.2",
     "mssql": "^12.7.14"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "optionalDependencies": {
+    "msnodesqlv8": "^6.2.2"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.2"
   }
 }

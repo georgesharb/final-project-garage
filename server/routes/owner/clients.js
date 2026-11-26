@@ -46,7 +46,10 @@ router.get('/:id', async (req, res) => {
     { id }
   );
 
-  const total = repairs.reduce((sum, r) => sum + Number(r.cost), 0);
+  // Total spent = repairs that are done (same rule as the income on the dashboard)
+  const total = repairs
+    .filter((r) => r.status === 'done')
+    .reduce((sum, r) => sum + Number(r.cost), 0);
 
   res.json({ client: clients[0], cars, repairs, total_spent: total });
 });
