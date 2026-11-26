@@ -38,6 +38,7 @@ app.use(express.json({ limit: '100kb' })); // read JSON bodies (small ones only)
 const loginLimit = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     limit: 10,
+    skipSuccessfulRequests: true, // only wrong passwords count
     message: { error: 'Too many login attempts, try again in 15 minutes' }
 });
 const registerLimit = rateLimit({
