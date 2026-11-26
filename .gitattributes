@@ -1,0 +1,6 @@
+# Same line endings for everyone (Windows and Mac/Linux): Git stores LF
+* text=auto
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
