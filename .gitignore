@@ -1,7 +1,9 @@
-# dependencies and build output
+# Dependencies
 node_modules/
+
+# Production build
 dist/
 
-# secrets: never commit a real .env (only .env.example and .env.demo)
+# Environment variables (private)
 .env
-.env.local
+**/.env
