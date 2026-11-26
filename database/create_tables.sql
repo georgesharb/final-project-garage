@@ -93,3 +93,7 @@ CREATE TABLE appointments (
 CREATE UNIQUE INDEX UX_users_single_owner
 ON users(role)
 WHERE role = 'owner';
+-- Faster search by plate number (the owner searches cars by plate or VIN).
+-- The VIN is UNIQUE, so SQL Server already has an index for it.
+CREATE INDEX IX_cars_plate_number
+ON cars(plate_number);
