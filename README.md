@@ -10,6 +10,7 @@ and the **owner** manages clients, cars, repairs and appointments from one panel
 |-|-|
 |Website (front end)|**https://gtav-garage.onrender.com**|
 |API (back end)|**https://gtav-garage-api.onrender.com** (shows "Garage Management API is running!")|
+|Code (GitHub)|**https://github.com/georgesharb/final-project-garage**|
 
 **Demo accounts**
 
@@ -95,7 +96,7 @@ Online, the values are in the Render settings.
 
 ```bash
 cd server \&\& npm test      # 28 tests: validation + API routes with Supertest (no database needed)
-cd client \&\& npm test      # 14 tests: main page, slideshow, login draft, API helper
+cd client \&\& npm test      # 17 tests: main page, slideshow, login draft, API helper, login token checks
 cd client \&\& npm run lint  # ESLint
 ```
 
