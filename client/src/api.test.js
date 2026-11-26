@@ -52,3 +52,30 @@ it('gives a clear message when the server cannot be reached', async () => {
   vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
   await expect(api('/me')).rejects.toThrow('We cannot reach the server right now');
 });
+
+// a token with the given role, expiring in "seconds" (negative = already expired)
+function fakeToken(role, seconds) {
+  const payload = btoa(JSON.stringify({ id: 1, role, exp: Math.floor(Date.now() / 1000) + seconds }));
+  return 'header.' + payload + '.signature';
+}
+
+it('takes the role from the token, not from the saved user', () => {
+  saveLogin(fakeToken('client', 3600), { email: 'a@b.com', role: 'owner' }); // someone edited "user"
+  expect(getUser().role).toBe('client');
+});
+
+it('is logged out when there is no token or the token expired', () => {
+  localStorage.setItem('user', JSON.stringify({ role: 'owner' })); // no token at all
+  expect(getUser()).toBe(null);
+
+  saveLogin(fakeToken('owner', -60), { role: 'owner' }); // expired 1 minute ago
+  expect(getUser()).toBe(null);
+  expect(localStorage.getItem('token')).toBe(null);
+});
+
+it('logs out when a client token is used on an owner page (403)', async () => {
+  saveLogin(fakeToken('client', 3600), { role: 'client' });
+  fakeFetch(403, { error: 'Access denied' });
+  await expect(api('/owner/clients')).rejects.toThrow('Access denied');
+  expect(window.location.assign).toHaveBeenCalledWith('/login');
+});

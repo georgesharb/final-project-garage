@@ -31,6 +31,9 @@ it('sends a visitor to /login when he clicks Book a visit', () => {
 });
 
 it('sends a logged-in client to /client when he clicks Book a visit', () => {
+  // a token with role "client" that expires in 1 hour (the signature is only checked by the server)
+  const payload = btoa(JSON.stringify({ id: 1, role: 'client', exp: Math.floor(Date.now() / 1000) + 3600 }));
+  localStorage.setItem('token', 'header.' + payload + '.signature');
   localStorage.setItem('user', JSON.stringify({ id: 1, email: 'client@garage.com', role: 'client' }));
   renderHome();
   // two buttons: in the hero and in the Contact section

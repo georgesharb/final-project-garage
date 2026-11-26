@@ -28,9 +28,10 @@ export async function api(path, method = 'GET', body) {
     data = {};
   }
 
-  // Token expired (after 1 day) or invalid: log out and go back to the login page.
+  // 401 = token expired (after 1 day) or invalid, 403 = wrong role (a client on an owner page):
+  // log out and go back to the login page.
   // (Not for /auth/login itself: a wrong password must just show the message.)
-  if (res.status === 401 && token && !path.startsWith('/auth/')) {
+  if ((res.status === 401 || res.status === 403) && token && !path.startsWith('/auth/')) {
     logout();
     window.location.assign('/login');
   }
@@ -46,8 +47,28 @@ export function saveLogin(token, user) {
   localStorage.setItem('user', JSON.stringify(user));
 }
 
+// Reads the inside of a JWT (the middle part, base64). It does NOT check the signature:
+// only the server can do that. We use it to know the role and the expiry date.
+function readToken(token) {
+  try {
+    const part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(part)); // { id, role, clientId, exp }
+  } catch {
+    return null; // not a real token
+  }
+}
+
+// The logged-in user, or null. The role comes from the token (not from what is saved
+// next to it), and an expired token logs out right away.
 export function getUser() {
-  return JSON.parse(localStorage.getItem('user')); // null if not logged in
+  const token = localStorage.getItem('token');
+  const payload = token ? readToken(token) : null;
+  if (!payload || (payload.exp && payload.exp * 1000 < Date.now())) {
+    logout();
+    return null;
+  }
+  const saved = JSON.parse(localStorage.getItem('user')) || {};
+  return { ...saved, role: payload.role };
 }
 
 export function logout() {
@@ -73,6 +94,7 @@ export const PHONE_HINT = 'Only numbers, example: 03 123 456';
 
 /* ---------- VIN decoder ---------- */
 // Asks our backend (which asks the free NHTSA API) for brand, model and year.
+// Fills brand, model and year from a VIN (through our server, which asks NHTSA)
 export async function decodeVin(vin) {
   return api('/vin/' + encodeURIComponent(vin.trim()));
 }

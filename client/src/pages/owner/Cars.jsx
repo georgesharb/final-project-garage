@@ -10,6 +10,8 @@ export default function Cars() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState('');
+  const [checkingVin, setCheckingVin] = useState(false); // true while the VIN is being checked
+  const [vinMessage, setVinMessage] = useState('');       // what the VIN decoder found
 
   async function loadCars() {
     setCars(await api('/owner/cars'));
@@ -60,12 +62,16 @@ export default function Cars() {
   // "Fill from VIN": brand, model and year come from the free NHTSA API (through our backend)
   async function fillFromVin() {
     setError('');
+    setVinMessage('');
+    setCheckingVin(true);
     try {
       const car = await decodeVin(form.vin);
       setForm({ ...form, brand: car.brand, model: car.model, year: car.year || form.year });
+      setVinMessage(`Found: ${car.brand} ${car.model} ${car.year || ''}` + (car.model ? '' : ' (add the model by hand)'));
     } catch (err) {
       setError(err.message);
     }
+    setCheckingVin(false);
   }
 
   async function handleDelete(id) {
@@ -91,9 +97,14 @@ export default function Cars() {
           ))}
         </select>
         <input aria-label="VIN (17 characters)" name="vin" placeholder="VIN (17 characters) *" minLength={17} maxLength={17} value={form.vin} onChange={handleChange} required />
-        <button type="button" className="btn-light" onClick={fillFromVin} disabled={form.vin.trim().length !== 17}>
-          Fill from VIN
+        <button type="button" className="btn-light" onClick={fillFromVin} disabled={checkingVin || form.vin.trim().length !== 17}>
+          {checkingVin ? 'Checking...' : 'Fill from VIN'}
         </button>
+        {vinMessage && <p className="success" role="status">{vinMessage}</p>}
+        {/* A VIN always has 17 characters: say how many are typed, so the user knows why the button is off */}
+        {form.vin.trim().length > 0 && form.vin.trim().length !== 17 && (
+          <p className="muted">A VIN has 17 characters: you typed {form.vin.trim().length}.</p>
+        )}
         <input aria-label="Brand" name="brand" placeholder="Brand *" value={form.brand} onChange={handleChange} required />
         <input aria-label="Model" name="model" placeholder="Model *" value={form.model} onChange={handleChange} required />
         <input aria-label="Year" name="year" type="number" placeholder="Year *" value={form.year} onChange={handleChange} required />

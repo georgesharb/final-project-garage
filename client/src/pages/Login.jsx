@@ -11,6 +11,7 @@ export default function Login() {
   const [form, setForm] = useState(loadDraft('loginDraft', { role: 'client', email: '', password: '' }));
   const role = form.role;
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false); // true while waiting for the server
 
   function handleChange(e) {
     const newForm = { ...form, [e.target.name]: e.target.value };
@@ -25,6 +26,7 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+    setBusy(true);
     try {
       // The backend checks that this account really has the chosen role
       const data = await api('/auth/login', 'POST', form);
@@ -34,6 +36,7 @@ export default function Login() {
     } catch (err) {
       setError(err.message);
     }
+    setBusy(false);
   }
 
   return (
@@ -52,7 +55,8 @@ export default function Login() {
         <label htmlFor="login-password">Password</label>
         <input id="login-password" name="password" type="password" placeholder="Enter your password" value={form.password} onChange={handleChange} required />
 
-        <button type="submit">Log in</button>
+        <button type="submit" disabled={busy}>{busy ? 'Logging in...' : 'Log in'}</button>
+        {busy && <p className="muted">(The first request can take up to a minute: the free server wakes up.)</p>}
 
         <p className="muted">
           Need an account? <Link to="/register">Sign up</Link>

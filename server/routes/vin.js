@@ -5,8 +5,9 @@ import express from 'express';
 
 const router = express.Router();
 
-// "TOYOTA" -> "Toyota"
-const nice = (text) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+// "TOYOTA" -> "Toyota", but short brands stay in capitals: "BMW", "KIA"
+const nice = (text) =>
+  text.length <= 3 ? text.toUpperCase() : text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 
 // GET /api/vin/JT2BF22K1W0123456  -> { brand, model, year }
 router.get('/:vin', async (req, res) => {
@@ -27,7 +28,8 @@ router.get('/:vin', async (req, res) => {
   // The answer looks like: { Results: [ { Make: "TOYOTA", Model: "Corolla", ModelYear: "2018", ... } ] }
   const car = data.Results?.[0];
   if (!car || !car.Make) {
-    return res.status(404).json({ error: 'No car found for this VIN. Fill in the fields by hand.' });
+    // NHTSA is a U.S. database: it knows most cars sold in America, but not every European model
+    return res.status(404).json({ error: 'This VIN is not in the free VIN database (it mostly knows cars sold in the USA). Fill in the fields by hand.' });
   }
 
   res.json({

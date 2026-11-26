@@ -9,6 +9,7 @@ export default function Register() {
   // The draft is read back from localStorage after a reload (never the password)
   const [form, setForm] = useState(loadDraft('signupDraft', { name: '', phone: '', email: '', password: '' }));
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false); // true while waiting for the server
 
   function handleChange(e) {
     const newForm = { ...form, [e.target.name]: e.target.value };
@@ -19,6 +20,7 @@ export default function Register() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+    setBusy(true);
     try {
       const data = await api('/auth/register', 'POST', form);
       clearDraft('signupDraft');
@@ -26,6 +28,7 @@ export default function Register() {
     } catch (err) {
       setError(err.message);
     }
+    setBusy(false);
   }
 
   return (
@@ -47,7 +50,8 @@ export default function Register() {
         <label htmlFor="register-password">Password</label>
         <input id="register-password" name="password" type="password" minLength={6} placeholder="At least 6 characters" value={form.password} onChange={handleChange} required />
 
-        <button type="submit">Sign up</button>
+        <button type="submit" disabled={busy}>{busy ? 'Creating your account...' : 'Sign up'}</button>
+        {busy && <p className="muted">(The first request can take up to a minute: the free server wakes up.)</p>}
 
         <p className="muted">
           Already have an account? <Link to="/login">Log in</Link>

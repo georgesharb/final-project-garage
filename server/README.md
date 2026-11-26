@@ -35,7 +35,7 @@ The database starts **empty** (no built-in data). Clients create their own accou
 ## Security
 - Passwords hashed with **bcrypt**. Login returns a **JWT** `{ id, role, clientId }`.
 - **helmet** headers, **CORS** limited to `FRONTEND_URL`, JSON body limit 100 kb.
-- **Rate limit**: 10 logins per 15 minutes, 10 sign ups per hour (answers 429).
+- **Rate limit**: 10 wrong logins per 15 minutes, 10 sign ups per hour (answers 429).
 - Every query goes through `query.js` with `@parameters` (no SQL injection).
 - `/api/owner/*` needs role `owner`, `/api/me/*` needs role `client`.
 - Client routes take the client id **from the token only**, so a client can never reach another client's data.

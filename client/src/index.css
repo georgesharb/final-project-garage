@@ -90,6 +90,13 @@ button {
 }
 button:hover { background: var(--ivory); border-color: var(--ivory); }
 
+/* Feedback: the button moves a little when pressed, is dimmed while waiting,
+   and shows a clear outline when reached with the keyboard (Tab) */
+button { transition: background 0.2s, border-color 0.2s, transform 0.1s; }
+button:active:not(:disabled) { transform: scale(0.96); }
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
 .btn-light { background: transparent; color: var(--gold); }
 .btn-light:hover { background: rgba(201, 169, 110, 0.12); border-color: var(--gold); }
 
@@ -150,7 +157,7 @@ button:hover { background: var(--ivory); border-color: var(--ivory); }
 .auth-card label { color: var(--dark-gold); }
 .auth-card input { background: white; color: var(--black); border-color: #ddd5c4; border-radius: 10px; }
 .auth-card input:focus { border-color: var(--gold); }
-.auth-card button { margin-top: 14px; border-radius: 10px; background: var(--black); color: var(--ivory); border-color: var(--black); transition: background 0.3s, border-color 0.3s; }
+.auth-card button { margin-top: 14px; border-radius: 10px; background: var(--black); color: var(--ivory); border-color: var(--black); transition: background 0.3s, border-color 0.3s, transform 0.1s; }
 .auth-card button:hover { background: var(--dark-gold); border-color: var(--dark-gold); }
 .auth-card .muted { color: var(--taupe); }
 .auth-card b { color: var(--black); }
